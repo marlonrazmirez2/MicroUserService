@@ -37,7 +37,7 @@ pipeline {
             steps {
                 echo 'Restarting user services'
                 sh """
-                    docker compose up -d postgres-user-dev user-service-dev
+                    docker compose --profile dev up -d postgres-user-dev user-service-dev
 
                 """
 
