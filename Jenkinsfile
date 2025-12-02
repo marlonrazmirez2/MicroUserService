@@ -1,6 +1,10 @@
- pipeline {
+pipeline {
     agent any
-
+    
+    tools {
+        maven 'Maven'  // ← CAMBIAR de 'M3' a 'Maven' (nombre exacto de tu instalación)
+    }
+    
     stages {
         stage('Checkout') {
             steps {
@@ -8,45 +12,51 @@
                 checkout scm
             }
         }
+        
+        stage('Verify Maven') {
+            steps {
+                sh 'mvn --version'
+            }
+        }
+        
         stage('Compile') {
             steps {
                 echo 'Compile the project'
                 sh 'mvn clean compile'
             }
         }
+        
         stage('Test') {
             steps {
                 echo 'Test the project'
                 sh 'mvn test'
             }
         }
+        
         stage('Package') {
             steps {
                 echo 'Package the project'
                 sh 'mvn package -DskipTests'
             }
         }
+        
         stage('Docker build') {
             steps {
                 echo 'Build Docker image'
                 sh 'docker build -t user-service-jgm:1.0 .'
             }
         }
-
+        
         stage('Docker Compose Restart') {
             steps {
                 echo 'Restarting user services'
                 sh """
-                    docker compose --profile dev up -d postgres-user-dev user-service-dev
-
+                    docker compose up -d postgres-user-dev user-service-dev
                 """
-
-
             }
         }
-
     }
-
+    
     post {
         success {
             echo 'Build completed successfully!'
